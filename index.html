@@ -1,0 +1,282 @@
+<html>
+<head>
+
+    <meta charset="UTF-8" />
+
+
+    <style>
+        .frame {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: teal;
+        }
+
+        .sprite {
+            width: 80px;
+            height: 80px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: url('sprites/littlefigthers2.png'); 
+        }
+
+        .dir-back {
+            transform: scaleX(-1);
+        }
+
+        .dir-front {
+            transform: scaleX(1);
+        }
+
+        .sprite-walk {
+            animation: walk 0.8s steps(4) infinite; 
+        }
+
+        .sprite-run {
+            left: 81px;
+            animation: run 0.8s steps(3) infinite; 
+        }
+
+        .sprite-throw {
+            top: 80px;
+            animation: throw 0.8s steps(7) infinite; 
+        }
+
+        .sprite-attack {
+            top: 160px;
+            animation: attack 0.8s steps(8) infinite; 
+        }
+
+        .sprite-hurt {
+            top: 240px;
+            animation: hurt 0.8s steps(8) infinite; 
+        }
+
+        .sprite-jump {
+            top: 320px;
+            animation: jump 0.8s steps(10) infinite; 
+        }
+        
+        .sprite-block {
+            top: 400px;
+            animation: block 0.8s steps(2) infinite; 
+        }
+
+        @keyframes
+        walk {
+            from { background-position-x: -320px;}
+            to { background-position-x: -640px;}
+
+            from { background-position-y: -0px;}
+            to { background-position-y: -0px;}
+        }
+
+        @keyframes
+        run {
+            from { background-position-x: 0;}
+            to { background-position-x: -240px;}
+
+            from { background-position-y: -160px;}
+            to { background-position-y: -160px;}
+        }
+
+        @keyframes
+        throw {
+            from { background-position-x: -160px;}
+            to { background-position-x: -720px;}
+
+            from { background-position-y: -160px;}
+            to { background-position-y: -160px;}
+        }
+
+        @keyframes
+        attack {
+            from { background-position-x: 0;}
+            to { background-position-x: -640px;}
+
+            from { background-position-y: -80px;}
+            to { background-position-y: -80px;}
+        }
+
+        @keyframes
+        hurt {
+            from { background-position-x: 0;}
+            to { background-position-x: -640px;}
+
+            from { background-position-y: -240px;}
+            to { background-position-y: -240px;}
+        }
+
+        @keyframes
+        jump {
+            from { background-position-x: 0;}
+            to { background-position-x: -800px;}
+
+            from { background-position-y: -480px;}
+            to { background-position-y: -480px;}
+        }
+
+        @keyframes
+        block {
+            from { background-position-x: -480px;}
+            to { background-position-x: -640px;}
+
+            from { background-position-y: -400px;}
+            to { background-position-y: -400px;}
+        }
+    </style>
+</head>
+<body>
+    <div id="frame" class="frame"></div>
+</body>
+
+<script>
+
+    var spriteWalk = createSprite("walk");
+    
+    var spriteRun = createSprite("run");
+    spriteRun.speed *= 2;
+    
+    var spriteThrow = createSprite("throw");
+
+    var spriteKick = createSprite("attack");
+    spriteKick.speed = 2;
+
+    var spriteHurt = createSprite("hurt");
+    spriteHurt.speed = 0;
+
+    var spriteJump = createSprite("jump");
+    spriteJump.speed *= 2;
+
+    var spriteBlock = createSprite("block");
+    spriteBlock.speed = 0;
+
+    function createSprite(move) {
+        var sprite = document.createElement("div");
+        sprite.className = "sprite sprite-" + move;
+        document.getElementById("frame").append(sprite);
+        sprite.speed = 5;
+        return sprite;
+    }
+
+    function move(sprite) {
+        if (sprite.offsetLeft + spriteWalk.offsetWidth >= document.body.clientWidth) {
+            moveBack(sprite);
+        } else if (sprite.offsetLeft <= 0) {
+            moveForward(sprite);
+        }
+        sprite.style.left = (parseInt(sprite.offsetLeft) | 0) + sprite.speed;
+    }
+
+    function moveBack(sprite) {
+        sprite.speed = (-1 * Math.abs(sprite.speed));
+        turnBack(sprite);
+    }
+
+    function moveForward(sprite) {
+        sprite.speed = Math.abs(sprite.speed);
+        turnForward(sprite);
+    }
+
+    function turnBack(sprite) {
+        sprite.classList.remove("dir-front");
+        sprite.classList.add("dir-back");
+    }
+
+    function turnForward(sprite) {
+        sprite.classList.remove("dir-back");
+        sprite.classList.add("dir-front");
+    }
+
+    function beatDown(spriteVictim, spriteBully) {
+        
+        if (!spriteVictim.figth && !spriteBully.figth) {            
+            spriteVictim.figth = true;
+            spriteBully.figth = true;
+            
+            spriteBully.style.animation = "attack 0.8s steps(8) infinite";
+            
+            if (parseInt(Math.random() * 178853) % 2 == 0) {
+                spriteVictim.style.animation = "block 0.8s steps(2) infinite";
+                
+            } else {
+                spriteVictim.style.animation = "hurt 0.8s steps(8) infinite";
+            }
+
+            setTimeout( function() {
+            faceToFace(spriteVictim, spriteBully);            
+                
+            spriteVictim.style.left = (parseInt(spriteVictim.offsetLeft) | 0) - (spriteVictim.speed | 0);
+            spriteBully.style.left = (parseInt(spriteBully.offsetLeft) | 0) - (spriteBully.speed | 0); 
+
+            spriteBully.style.animation = "walk 0.8s steps(4) infinite";
+            spriteVictim.style.animation = "run 0.8s steps(3) infinite";
+            spriteVictim.speed = 10;
+            spriteBully.speed = 5;
+
+            walkAway(spriteVictim, spriteBully);
+                
+            setTimeout( function() {
+                spriteVictim.figth = false;
+                spriteBully.figth = false;
+            },0);
+            }, 800);
+        }
+    }
+
+    function faceToFace(spriteA, spriteB) {
+        if ((spriteA.offsetWidth | 0) > (spriteB.offsetWidth | 0)) {
+            turnBack(spriteB);
+            turnForward(spriteA);
+        } else {
+            turnBack(spriteA);
+            turnForward(spriteB);
+        }
+    }
+
+    function walkAway(spriteA, spriteB) {
+        if ((spriteA.offsetWidth | 0) > (spriteB.offsetWidth | 0)) {
+            moveBack(spriteA);
+            moveForward(spriteB);
+        } else {
+            moveBack(spriteB);
+            moveForward(spriteA);
+        }
+        move(spriteA);
+        move(spriteB);
+    }
+
+    setInterval(function() {
+        var speed = 2;
+        if (isCollisionSquare(spriteWalk, spriteRun)) {
+            if (parseInt(Math.random() * 113753) % 2 == 0) {
+                beatDown(spriteWalk, spriteRun);            
+            } else {
+                beatDown(spriteRun, spriteWalk);
+            }
+        } else {
+            move(spriteWalk);
+            move(spriteRun);
+       }
+        move(spriteThrow);
+        move(spriteKick);
+        move(spriteHurt);
+        move(spriteJump);
+    }, 50);
+
+    function isCollisionSquare(divA, divB) {
+        var offset = 25;
+
+        var collY = (divA.offsetTop <= divB.offsetTop && divA.offsetTop + divA.offsetHeight >= divB.offsetTop) || (divB.offsetTop <= divA.offsetTop && divB.offsetTop + divA.offsetHeight >= divA.offsetTop);
+
+        var collX = (divA.offsetLeft <= divB.offsetLeft && divA.offsetLeft + divA.offsetWidth - offset >= divB.offsetLeft) || (divB.offsetLeft <= divA.offsetLeft && divB.offsetLeft + divB.offsetWidth - offset  >= divA.offsetLeft);
+
+
+        return collX && collY;
+    }
+
+</script>
+</html>
